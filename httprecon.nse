@@ -41,6 +41,7 @@ http://www.computec.ch/projekte/httprecon/
 -- |_10  Zeus 4.3           68     33
 
 --@changelog
+-- v0.6 | 09/27/2017 | Marc Ruef | Fixed typo in filename etag-length.fdb
 -- v0.5 | 05/02/2010 | Marc Ruef | Added argument support (disable test requests)
 -- v0.4 | 05/01/2010 | Marc Ruef | Finalized fingerprint analysis
 -- v0.3 | 04/30/2010 | Marc Ruef | Added error handling and debugging mode
@@ -182,7 +183,7 @@ function identify_fingerprint(response, database)
 	find_match_in_db(database .. "cache-control.fdb",		get_header_value(get_header_line(response.rawheader, "Cache-Control", false)), 2)
 	find_match_in_db(database .. "connection.fdb",			get_header_value(get_header_line(response.rawheader, "Connection", false)), 2)
 	find_match_in_db(database .. "content-type.fdb",		get_header_value(get_header_line(response.rawheader, "Content-Type", false)), 1)
-	find_match_in_db(database .. "etag-legth.fdb",			string.format("%s", string.len(get_header_value(get_header_line(response.rawheader, "ETag", false)))), 3)
+	find_match_in_db(database .. "etag-length.fdb",			string.format("%s", string.len(get_header_value(get_header_line(response.rawheader, "ETag", false)))), 3)
 	find_match_in_db(database .. "etag-quotes.fdb",			get_quotes(get_header_value(get_header_line(response.rawheader, "ETag", false))), 2)
 	find_match_in_db(database .. "header-capitalafterdash.fdb",	string.format("%s", capital_after_dash(analyze_header_order(response.rawheader))), 2)
 	find_match_in_db(database .. "header-order.fdb",		analyze_header_order(response.rawheader), 5)
