@@ -41,6 +41,7 @@ http://www.computec.ch/projekte/httprecon/
 -- |_10  Zeus 4.3           68     33
 
 --@changelog
+-- v0.7 | 09/29/2017 | Marc Ruef | Script can now be used with --script-updatedb
 -- v0.6 | 09/27/2017 | Marc Ruef | Fixed typo in filename etag-length.fdb
 -- v0.5 | 05/02/2010 | Marc Ruef | Added argument support (disable test requests)
 -- v0.4 | 05/01/2010 | Marc Ruef | Finalized fingerprint analysis
@@ -59,10 +60,10 @@ author = "Marc Ruef, marc.ruef-at-computec.ch, http://www.computec.ch/mruef/"
 license = "Same as Nmap--See http://nmap.org/book/man-legal.html"
 categories = {"default", "safe"}
 
-require "shortport"
-require "tab"
-require "http"
-require "stdnse"
+local shortport	= require "shortport"
+local tab	= require "tab"
+local http	= require "http"
+local stdnse	= require "stdnse"
 
 result = {}	-- Global result data
 
@@ -164,9 +165,9 @@ function send_http_request(host, port, method, resource)
 	if type(res) == "table" then
 		stdnse.print_debug(2, "httprecon: Received response")
 
---		for i=1, #res.rawheader, 1 do
---			stdnse.print_debug(3, "httprecon: \t%s", res.rawheader[i])
---		end
+		for i=1, #res.rawheader, 1 do
+			stdnse.print_debug(3, "httprecon: \t%s", res.rawheader[i])
+		end
 
 		return res
 	else
@@ -209,17 +210,21 @@ function find_match_in_db(databasefile, fingerprint, basescore)
 
 	stdnse.print_debug(3, "httprecon: Looking for matches of %s", fingerprint)
 	for i=1, #database, 1 do
+		database[i] = string.gsub(database[i], "%s", "")
+	
 		delimiterpos = string.find(database[i], ";")
 
 		if type(delimiterpos) == "number" then
+			stdnse.print_debug(4, "httprecon: Find delimiter at position %d", delimiterpos)
 			name = string.sub(database[i], 1, delimiterpos - 1)
 			pattern = string.sub(database[i], delimiterpos + 1)
 
 			if type(pattern) == "string" and pattern ~= "" and type(name) == "string" and name ~= "" then
+				stdnse.print_debug(4, "httprecon: Looking for pattern %s", pattern)
 				if fingerprint == pattern then
 					arraypos = in_array(result, name)
 
-					stdnse.print_debug(4, "httprecon: Find match for %s", name)
+					stdnse.print_debug(3, "httprecon: Find match for %s", name)
 					if type(arraypos) == "number" then
 						result[arraypos] = {
 							matchname = name,
